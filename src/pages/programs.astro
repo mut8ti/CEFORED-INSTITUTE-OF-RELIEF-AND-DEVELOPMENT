@@ -1,0 +1,117 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import Button from '../components/Button.astro';
+import PageHead from '../components/PageHead.astro';
+import { realms } from '../data/realms.js';
+
+const totalCourses = realms.reduce((n, r) => n + r.courses.length, 0);
+---
+
+<BaseLayout
+  title="Programs — CEFORED Institute of Relief"
+  description="Six realms of AI-driven training: logistics and supply chain, business management, health, project management, IT and digital transformation, and humanitarian response."
+  preloadImage="/images/programsbg.webp"
+  ogImage="/images/programsbg.webp"
+>
+
+  <PageHead
+    eyebrow={`${totalCourses} courses · 6 realms`}
+    title="Explore our programs"
+    lede="Six realms of AI-driven training, from supply chain and business management to health, projects, IT, and humanitarian response. Every course names the roles it is written for."
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="realm-grid" data-reveal-group="scale">
+        {realms.map(r => (
+          <Card href={`/realms/${r.slug}`} pad="l" class="program-card">
+            <div class="program-head">
+              <Icon name={`ph:${r.icon}`} class="program-icon" />
+              <span class="program-n">Realm {r.n}</span>
+            </div>
+            <h2>{r.title}</h2>
+            <p class="program-tagline">{r.tagline}</p>
+            <ul class="program-courses">
+              {r.courses.slice(0, 3).map(c => <li>{c.name}</li>)}
+              {r.courses.length > 3 && (
+                <li class="more">+ {r.courses.length - 3} more</li>
+              )}
+            </ul>
+            <span class="program-more">
+              View all {r.courses.length} courses
+              <Icon name="ph:arrow-right" />
+            </span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section band cta-band">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Training a whole team?</h2>
+      <p class="lede">
+        We run tailored corporate programs for NGOs, businesses, and government
+        institutions, priced per cohort.
+      </p>
+      <div class="btn-row" data-reveal>
+        <Button href="/corporate-training">Corporate Training</Button>
+        <Button href="/contact" variant="ghost">Talk to Admissions</Button>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .realm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: var(--space-m);
+  }
+
+  .program-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .program-head { display: flex; align-items: center; gap: var(--space-2xs); }
+  .program-icon { width: 2em; height: 2em; color: var(--accent); }
+  .program-n {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .program-card h2 { font-size: var(--fs-500); color: var(--brand-fg); margin: 0; }
+  .program-tagline { color: var(--text-muted); font-size: var(--fs-200); }
+
+  .program-courses {
+    margin: 0 0 var(--space-s);
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-200);
+  }
+  .program-courses li {
+    padding: var(--space-3xs) 0;
+    border-top: 1px solid var(--border);
+  }
+  .program-courses .more { color: var(--text-muted); font-style: italic; }
+
+  .program-more {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    margin-top: auto;
+    font-size: var(--fs-200);
+    font-weight: var(--fw-semibold);
+    color: var(--brand-fg);
+  }
+
+  .cta-band .lede { margin-bottom: var(--space-m); }
+</style>

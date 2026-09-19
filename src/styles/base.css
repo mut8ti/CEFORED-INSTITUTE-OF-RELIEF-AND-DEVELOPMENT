@@ -1,0 +1,704 @@
+/* Shared shell: reset, typography, header/nav, footer, buttons, layout primitives.
+   Imported globally by BaseLayout. Page-specific rules live in each page's
+   scoped <style> block, so they cannot collide with anything here. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding-top: var(--header-h);
+  /* @fontsource-variable/nunito-sans registers the family as "Nunito Sans Variable", not
+     "Nunito Sans" — asking for plain Nunito Sans silently falls through to system-ui. */
+  font-family: "Nunito Sans Variable", "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: var(--fs-300);
+  line-height: var(--lh-body);
+  color: var(--text);
+  background-color: var(--bg);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Headings sit on the type scale; nothing else should set a font-size or a
+   weight. Until now none of these set font-weight at all, so every heading on
+   the site ran on the browser's default bold — one value out of an 800-step
+   axis. */
+h1 {
+  font-size: var(--fs-800);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--ls-display);
+}
+h2 {
+  font-size: var(--fs-700);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+}
+h3 { font-size: var(--fs-600); line-height: var(--lh-snug); font-weight: var(--fw-bold); }
+h4 { font-size: var(--fs-500); line-height: var(--lh-snug); font-weight: var(--fw-bold); }
+h1, h2, h3, h4 {
+  margin: 0 0 var(--space-xs);
+  text-wrap: balance;      /* avoids one-word orphan lines in headings */
+}
+
+p { margin: 0 0 var(--space-s); }
+p:last-child { margin-bottom: 0; }
+
+img, svg, video { max-width: 100%; height: auto; }
+
+/* Prose links only. :where() keeps specificity at 0 and :not([class]) leaves
+   every component link (.btn, .nav a, .brand …) to manage its own colour —
+   a blanket `a { }` rule outranks .btn and turns buttons unreadable. */
+:where(a:not([class])) { color: var(--brand-fg); }
+
+/* Two-tone focus ring. A single colour cannot clear 3:1 (WCAG 2.2 §1.4.11)
+   against white cards, the teal header AND hero photography at once — the old
+   orange ring sat at 2.6:1 on the page background and 2.4:1 on the header. The
+   halo fills the outline-offset gap, so whichever ring the backdrop swallows,
+   the other one contrasts against it. */
+:where(a, button, summary, input, textarea, select):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--focus-halo);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Layout primitives ---------- */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-m);
+}
+
+.section { padding-block: var(--space-xl); }
+.section-lg { padding-block: var(--space-2xl); }
+
+/* Constrain prose to a readable measure */
+.prose { max-width: var(--measure); }
+.prose-center { max-width: var(--measure); margin-inline: auto; }
+
+/* Full-bleed coloured band, e.g. the partners strip. Carries a faint line
+   grid so a large flat slab of brand colour doesn't read as empty; the mask
+   fades it out at the edges so it never draws a hard rectangle. */
+.band {
+  position: relative;
+  background: var(--band);
+  color: var(--text-on-brand);
+}
+
+.band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right,  var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 30%, transparent 78%);
+}
+.band > * { position: relative; }
+.band h1, .band h2, .band h3 { color: var(--text-on-brand); }
+
+/* Centred heading, now used ONLY inside .band. A short call to action in a
+   coloured block is centred deliberately; everywhere else uses .section-head
+   below, because a centred heading over left-aligned content gives the eye no
+   edge to return to.
+
+   No decorative rule beneath it — that carried no meaning and was identical on
+   every section of every page. The larger bottom margin holds the vertical
+   rhythm the removed bar used to occupy. */
+.section-title {
+  color: var(--brand-fg);
+  text-align: center;
+  margin-bottom: var(--space-l);
+}
+.band .section-title { color: var(--text-on-brand); }
+
+/* Left-aligned section heading, optionally with facts sitting on the right.
+   The centred .section-title above stays for bands and CTAs, where centring
+   actually means something. Everywhere else the eye needs a left edge to
+   return to, and this is what pages move onto as they get reworked. */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-s) var(--space-l);
+  margin-bottom: var(--space-m);
+}
+.section-head h2 { margin: 0; color: var(--brand-fg); }
+.band .section-head h2 { color: var(--text-on-brand); }
+
+/* Deliberately sets no text-align and no inline margin, so it inherits from
+   whatever it sits in: left on an ordinary page, centred inside a band or on
+   the 404, which centres its whole container. Forcing `center` here was what
+   left ledes centred over left-aligned content. */
+.lede {
+  max-width: var(--measure);
+  margin-bottom: var(--space-l);
+  font-size: var(--fs-400);
+  color: var(--text-muted);
+}
+.band .lede {
+  margin-inline: auto;
+  text-align: center;
+  color: rgb(255 255 255 / 0.85);
+}
+
+/* ---------- Icons ----------
+   Phosphor Icons, inlined at build time by astro-icon. Only the icons actually used
+   ship; there is no runtime JS and no icon-font request. */
+
+[data-icon] {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.15em;
+  flex: none;
+}
+.icon-accent { color: var(--accent); }
+.icon-lg { width: 1.75em; height: 1.75em; }
+
+/* ---------- Buttons ---------- */
+
+/* Hover fills the button from the bottom and inverts the label.
+
+   The previous version transitioned border-*-color round the perimeter, which
+   cannot read as a travelling stroke: a border side fades in as a whole, so it
+   showed four edges blinking in sequence, and the corner arcs — each shared by
+   two sides — popped as the sequence handed over.
+
+   A fill rising from the bottom edge covers a centred label evenly, so the
+   label colour can flip mid-sweep without ever sitting on a half-covered
+   background. prefers-reduced-motion collapses the durations in tokens.css, so
+   this degrades to an instant, still-legible state change. */
+.btn {
+  position: relative;
+  isolation: isolate;          /* keeps the ::before fill behind the label     */
+  overflow: hidden;            /* clips the fill to the rounded corners        */
+  display: inline-block;
+  padding: var(--space-xs) var(--space-m);
+  border: 1px solid transparent;   /* matches .btn-ghost's geometry exactly    */
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font: inherit;
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease;
+
+  --btn-fill:        var(--brand-dark);
+  --btn-label-hover: #fff;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.34s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  color: var(--btn-label-hover);
+  /* Held back so the label flips once the fill is under it, not before it. */
+  transition: color 0.18s ease 0.1s;
+}
+.btn:hover::before,
+.btn:focus-visible::before { transform: scaleY(1); }
+
+.btn:active { transform: translateY(1px); }
+
+/* Secondary button. Defaults to the PAGE background — brand outline, brand
+   label — because that is where most of them sit. It previously defaulted to
+   white-on-white, which was correct only inside a .band and invisible anywhere
+   else; the homepage hero lost its photo backdrop and the button vanished
+   with it. Contexts with a dark backdrop opt in below. */
+.btn-ghost {
+  background: transparent;
+  border-color: var(--brand-fg);
+  color: var(--brand-fg);
+
+  --btn-fill:        var(--brand-fg);
+  --btn-label-hover: var(--surface);
+}
+
+/* Any always-dark backdrop — a brand band, or the scrim over hero photography —
+   inverts it: white outline and label, filling to white with a near black
+   label. Not var(--text), which is near white in dark mode.
+
+   Keyed off .on-dark rather than .hero: the homepage hero is light type on the
+   page background and shares that class name, so a .hero selector would put
+   white-on-white right back. */
+/* :where() so the ancestor adds NO specificity — this must stay at 0,1,0, the
+   same as .btn-ghost. Written as `.band .btn-ghost` it scores 0,2,0, ties with
+   `.btn:hover` and, being later in the file, overrides the hover colour: the
+   fill turned white while the label stayed white. */
+:where(.band, .on-dark) .btn-ghost {
+  border-color: rgb(255 255 255 / 0.55);
+  color: #fff;
+
+  --btn-fill:        #fff;
+  --btn-label-hover: #14161c;
+}
+
+.btn-sm { padding: var(--space-2xs) var(--space-s); font-size: var(--fs-200); }
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  justify-content: center;
+}
+
+/* ---------- Header & nav ----------
+   The bar was a solid slab of saturated teal on every page — a hard edge
+   against the paper background, and the loudest thing on screen before the
+   content had said anything. It now sits on the page background and stays
+   invisible until you scroll, at which point a hairline and a soft shadow
+   separate it from the content passing underneath.
+
+   Because it takes --bg and --text, dark mode needs no header rules at all. */
+
+.scroll-sentinel {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+}
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding-inline: var(--space-m);
+  color: var(--text);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.35s, border-color 0.35s, box-shadow 0.35s;
+}
+
+/* .is-scrolled is set from an IntersectionObserver on a sentinel, not a scroll
+   listener, so there is no work on the scroll thread. */
+.site-header.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom-color: var(--border);
+  box-shadow: 0 1px 24px rgb(0 0 0 / 0.05);
+}
+/* backdrop-filter unsupported: fall back to an opaque bar rather than letting
+   content scroll through unreadably behind it. */
+@supports not (backdrop-filter: blur(1px)) {
+  .site-header.is-scrolled { background: var(--bg); }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-right: auto;
+  color: inherit;
+  text-decoration: none;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-400);
+  letter-spacing: -0.01em;
+}
+
+/* The mark has a cream background baked in — no alpha — so it needs a light
+   chip in both themes regardless of what the bar is doing. */
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+.brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-text small {
+  font-size: var(--fs-100);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav { display: flex; gap: var(--space-2xs); }
+
+/* Active state is a rule under the label, not a filled pill. The pill was a
+   heavy white blob and the only element on the site shaped like that; an
+   underline that grows from the left is the same gesture as the footer links
+   and the realm rows, so hover behaviour is one idea site-wide. */
+.nav a {
+  position: relative;
+  padding: var(--space-2xs) var(--space-3xs);
+  color: var(--text-muted);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: var(--space-3xs);
+  right: var(--space-3xs);
+  bottom: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--brand-fg);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav a:hover,
+.nav a:focus-visible { color: var(--text); }
+.nav a:hover::after { transform: scaleX(1); }
+
+.nav a[aria-current="page"] {
+  color: var(--brand-fg);
+  font-weight: var(--fw-semibold);
+}
+.nav a[aria-current="page"]::after { transform: scaleX(1); }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  /* 44px is the minimum comfortable touch target. */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  /* --border is a separator tint at 1.2:1 on the page — fine between cards,
+     too faint to read as the edge of a control. Mixed halfway to the text
+     colour it reaches 3.7:1, clearing the 3:1 that WCAG 2.2 §1.4.11 wants for
+     a component boundary. */
+  border: 1px solid color-mix(in srgb, var(--text) 50%, var(--border));
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.icon-btn:hover {
+  background: var(--surface-2);
+  border-color: var(--brand-fg);
+}
+
+/* Both theme icons ship; CSS picks one. Swapping textContent in JS meant the
+   button was empty until the script ran, and emoji render differently on every
+   platform next to a drawn icon set. */
+.theme-toggle .icon-sun { display: none; }
+html.dark-mode .theme-toggle .icon-sun { display: block; }
+html.dark-mode .theme-toggle .icon-moon { display: none; }
+
+/* Two bars crossing into an X. Three is the convention but the middle bar can
+   only fade, which is the part that always looks cheap. */
+.bars {
+  display: grid;
+  gap: 5px;
+  width: 18px;
+}
+.bars span {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-toggle[aria-expanded="true"] .bars span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .bars span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+.nav-toggle { display: none; }
+
+@media (max-width: 950px) {
+  .nav-toggle { display: grid; }
+
+  .nav {
+    position: absolute;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: var(--space-2xs) var(--space-s) var(--space-s);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    display: none;
+
+    /* A short landscape phone can be ~360px tall. Six 48px rows plus the
+       header exceed that, so the last items become unreachable without this. */
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* aria-expanded on the button is the single source of truth for open state. */
+  .site-header:has(.nav-toggle[aria-expanded="true"]) .nav { display: flex; }
+
+  .nav a {
+    padding: var(--space-xs) var(--space-2xs);
+    font-size: var(--fs-300);
+  }
+  .nav a + a { border-top: 1px solid var(--border); }
+  /* The underline would sit on the row divider and read as a thick border. */
+  .nav a::after { display: none; }
+  .nav a[aria-current="page"] {
+    border-left: 2px solid var(--brand-fg);
+    padding-left: var(--space-xs);
+  }
+}
+
+/* Very small screens: drop the strapline so the brand, theme toggle and
+   hamburger still fit on one row. */
+@media (max-width: 24rem) {
+  .brand-text small { display: none; }
+  .brand-mark { width: 38px; height: 38px; }
+}
+
+/* ---------- Footer ---------- */
+
+/* A real sitemap rather than five links and a copyright line. /admission and
+   /blog are not in the top nav, so this is the only durable route to them. */
+.site-footer {
+  padding-block: var(--space-xl) var(--space-l);
+  background: var(--brand);
+  color: var(--text-on-brand);
+  font-size: var(--fs-200);
+}
+html.dark-mode .site-footer { background: var(--band); }
+
+.footer-top {
+  display: grid;
+  /* Brand column takes more room; the three link columns share what is left. */
+  grid-template-columns: minmax(15rem, 1.5fr) repeat(3, minmax(9rem, 1fr));
+  gap: var(--space-l) var(--space-m);
+  padding-bottom: var(--space-l);
+}
+
+.footer-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: var(--space-xs);
+}
+.footer-mark img { width: 100%; height: 100%; object-fit: contain; }
+
+.footer-name {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--fs-400);
+  font-weight: var(--fw-bold);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.footer-name span {
+  font-size: var(--fs-100);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.footer-blurb {
+  margin: 0;
+  max-width: 30ch;
+  /* 0.78 is the lowest alpha that clears 4.5:1 against the teal band. */
+  color: rgb(255 255 255 / 0.8);
+}
+
+.footer-col h2 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--fs-100);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.8);
+}
+.footer-col ul { margin: 0; padding: 0; list-style: none; }
+.footer-col li + li { margin-top: var(--space-3xs); }
+
+/* Underline grows from the left on hover instead of appearing all at once —
+   the same directional logic as the buttons and the realm index rows. */
+.site-footer a {
+  position: relative;
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  padding-block: 2px;
+}
+.site-footer a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.site-footer a:hover::after { transform: scaleX(1); }
+
+/* Plain white: the amber only reaches 2.61:1 on the teal band. */
+.footer-n {
+  display: inline-block;
+  min-width: 1.9em;
+  font-weight: var(--fw-medium);
+  color: rgb(255 255 255 / 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+.footer-plain { color: rgb(255 255 255 / 0.8); }
+
+/* Qualified with .site-footer so it outranks `.site-footer a` (0,1,1) on
+   specificity rather than with !important. */
+.site-footer .footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  margin-top: var(--space-s);
+  font-weight: var(--fw-semibold);
+  color: var(--accent-on-dark);
+}
+.footer-cta [data-icon] { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.footer-cta:hover [data-icon] { transform: translateX(0.3em); }
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-m);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-m);
+  border-top: 1px solid rgb(255 255 255 / 0.18);
+  color: rgb(255 255 255 / 0.8);
+}
+.footer-bottom p { margin: 0; }
+
+@media (max-width: 60rem) {
+  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 34rem) {
+  .footer-top { grid-template-columns: 1fr; gap: var(--space-m); }
+}
+
+/* ---------- Forms ---------- */
+
+.field { margin-bottom: var(--space-s); }
+.field label {
+  display: block;
+  margin-bottom: var(--space-3xs);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-semibold);
+}
+.field .hint { color: var(--text-muted); font-weight: var(--fw-medium); }
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: var(--space-2xs) var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input:hover, .select:hover, .textarea:hover { border-color: var(--brand-fg); }
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--brand-fg);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-fg) 25%, transparent);
+  outline: none;
+}
+.textarea { min-height: 8rem; resize: vertical; }
+
+/* Country code + local number share one row */
+.phone-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) 1fr;
+  gap: var(--space-2xs);
+}
+@media (max-width: 30rem) {
+  .phone-row { grid-template-columns: 1fr; }
+}
+
+/* Hidden from people, visible to bots. Not display:none — some bots skip that. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+[data-form-status] {
+  margin-top: var(--space-s);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-200);
+  font-weight: var(--fw-medium);
+}
+[data-form-status=""] { display: none; }
+[data-form-status="pending"] { color: var(--text-muted); }
+/* Tint only, no leading rule. Raised from 12% because the border was carrying
+   most of the signal; at 12% alone the fill barely registered. The message text
+   states the outcome, so colour is never the only cue. */
+[data-form-status="ok"] {
+  background: color-mix(in srgb, #2e7d32 18%, transparent);
+}
+[data-form-status="error"] {
+  background: color-mix(in srgb, #c62828 18%, transparent);
+}
+
+/* ---------- Motion ----------
+   The pre-animation hidden state applies only when the inline probe in
+   BaseLayout has confirmed JS is running AND the user allows motion. With JS
+   off, blocked, or reduced-motion set, none of this applies and everything
+   renders normally — content is never hostage to the animation library. */
+html.js-motion [data-reveal],
+html.js-motion [data-reveal-group] > *,
+html.js-motion [data-hero-item] {
+  opacity: 0;
+}
+
+/* A connector that draws in as you scroll through it. Scaled on the Y axis
+   rather than stroked with dashoffset: for a straight line the result is
+   identical, but transform stays on the compositor instead of repainting the
+   stroke every frame, and it avoids SVG length units, which are ambiguous
+   inside a viewBox stretched with preserveAspectRatio="none".
+
+   Fully drawn by default, so no-JS and reduced-motion users get the finished
+   line rather than an empty gutter. */
+[data-draw] { transform-origin: top; }
+html.js-motion [data-draw] { transform: scaleY(0); }

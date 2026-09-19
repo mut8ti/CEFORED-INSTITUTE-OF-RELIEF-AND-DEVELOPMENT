@@ -1,0 +1,304 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import Button from '../../components/Button.astro';
+import Accordion from '../../components/Accordion.astro';
+import AccordionItem from '../../components/AccordionItem.astro';
+import PageHead from '../../components/PageHead.astro';
+import { realms } from '../../data/realms.js';
+
+import logisticsHero from '../../assets/images/realms/logistics-hero.webp';
+import businessHero from '../../assets/images/realms/business-hero.webp';
+import healthHero from '../../assets/images/realms/health-hero.webp';
+import projectManagementHero from '../../assets/images/realms/project-management-hero.webp';
+import itDigitalHero from '../../assets/images/realms/it-digital-hero.webp';
+import humanitarianHero from '../../assets/images/realms/humanitarian-hero.webp';
+
+const heroImages = {
+  logistics: logisticsHero,
+  business: businessHero,
+  health: healthHero,
+  'project-management': projectManagementHero,
+  'it-digital': itDigitalHero,
+  humanitarian: humanitarianHero,
+};
+
+export function getStaticPaths() {
+  return realms.map((realm) => ({ params: { slug: realm.slug }, props: { realm } }));
+}
+
+const { realm } = Astro.props;
+const others = realms.filter((r) => r.slug !== realm.slug);
+
+// Rich results for course listings.
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: `Courses in ${realm.title}`,
+  itemListElement: realm.courses.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Course',
+      name: c.name,
+      description: c.objectives || realm.overview,
+      provider: {
+        '@type': 'EducationalOrganization',
+        name: 'CEFORED Institute of Relief and Development',
+        sameAs: 'https://www.ceforedconsultancy.com',
+      },
+    },
+  })),
+};
+
+/* Every course in the catalogue is $450–490 and 3–4 weeks, so a fee on each row
+   is 29 near-identical numbers pretending to be information. State the range
+   once here and give the rows over to what actually differs. */
+const fees = realm.courses.map((c) => Number(String(c.fee).replace(/\D/g, ''))).filter(Boolean);
+const feeRange = fees.length
+  ? (Math.min(...fees) === Math.max(...fees)
+      ? `$${Math.min(...fees)}`
+      : `$${Math.min(...fees)}–${Math.max(...fees)}`)
+  : null;
+
+const weeks = [...new Set(realm.courses.map((c) => (c.duration || '').match(/^\d+/)?.[0]).filter(Boolean))];
+const weekRange = weeks.length ? `${weeks.sort().join('–')} weeks` : null;
+
+/* "Logistics Officers, Procurement Units, Relief Program Teams" -> discrete
+   roles, so they can be set as a list rather than a run-on sentence. */
+const rolesOf = (course) =>
+  (course.audience || '').split(',').map((s) => s.trim()).filter(Boolean);
+---
+
+<BaseLayout
+  title={`Realm ${realm.n}: ${realm.title} — CEFORED Institute of Relief`}
+  description={realm.overview}
+  preloadImage={realm.bg}
+  ogImage={realm.bg}
+  schema={schema}
+>
+
+  <PageHead
+    eyebrow={`Realm ${String(realm.n).padStart(2, '0')}`}
+    eyebrowIcon={realm.icon}
+    title={realm.title}
+    lede={realm.tagline}
+    image={heroImages[realm.slug]}
+  />
+
+  {/* Prose at a readable measure, not a bordered box. One paragraph inside
+      card chrome was the last generic panel on the page. */}
+  <section class="section overview-section">
+    <div class="container">
+      <div class="overview" data-reveal>
+        <h2>Program overview</h2>
+        <p>{realm.overview}</p>
+        {realm.idealFor && (
+          <p class="ideal"><strong>Ideal for:</strong> {realm.idealFor}</p>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head courses-head" data-reveal>
+        <h2>{realm.courses.length} courses</h2>
+        {/* The facts that are true of every course, stated once. */}
+        <dl class="terms">
+          {weekRange && <div><dt>Length</dt><dd>{weekRange}</dd></div>}
+          {feeRange && <div><dt>Fee</dt><dd>{feeRange}</dd></div>}
+          <div><dt>Delivery</dt><dd>Online, live-virtual, or in person</dd></div>
+        </dl>
+      </div>
+
+      <Accordion width="52rem" data-reveal-group>
+        {realm.courses.map((course) => (
+          <AccordionItem>
+            <Fragment slot="summary">
+              <span class="course-head">
+                <span class="course-name">{course.name}</span>
+                {/* The signature line. Who a course is for is the one thing that
+                    genuinely differs between them, so it is never hidden. */}
+                {rolesOf(course).length > 0 && (
+                  <span class="course-for">
+                    <span class="for-label">For</span>
+                    {rolesOf(course).map((role) => (
+                      <span class="role">{role}</span>
+                    ))}
+                  </span>
+                )}
+              </span>
+            </Fragment>
+
+            {course.objectives && (
+              <p class="course-objectives">{course.objectives}</p>
+            )}
+            <dl class="terms terms-inline">
+              {course.requirements && (
+                <div><dt>Requires</dt><dd>{course.requirements}</dd></div>
+              )}
+              {course.duration && (
+                <div><dt>Length</dt><dd>{course.duration}</dd></div>
+              )}
+            </dl>
+            <Button href={`/contact?course=${encodeURIComponent(course.name)}`} size="sm" class="course-cta">Apply for this course</Button>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  </section>
+
+  <section class="section band cta-band">
+    <div class="container">
+      <h2 class="section-title" data-reveal>Ready to start?</h2>
+      <p class="lede">
+        Talk to our admissions team about intake dates, group rates, and
+        organization-wide training.
+      </p>
+      <div class="btn-row" data-reveal>
+        <Button href="/admission">Apply Now</Button>
+        <Button href={`/contact?course=${encodeURIComponent(realm.slug)}`} variant="ghost">Contact Admissions</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head" data-reveal><h2>Explore other realms</h2></div>
+      <div class="realm-links" data-reveal-group="scale">
+        {others.map((r) => (
+          <Card href={`/realms/${r.slug}`} class="realm-link">
+            <Icon name={`ph:${r.icon}`} class="realm-link-icon" />
+            <span class="realm-link-n">Realm {r.n}</span>
+            <span class="realm-link-title">{r.title}</span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ---------- Overview ---------- */
+  .overview-section { padding-top: var(--space-l); }
+
+  .overview { max-width: 46rem; }
+  .overview h2 { font-size: var(--fs-600); color: var(--brand-fg); }
+  .overview p { font-size: var(--fs-400); }
+  .ideal { margin-bottom: 0; color: var(--text-muted); }
+
+  /* ---------- Courses ----------
+     Matches the accordion's own width so the heading and the rows share a left
+     edge — down a list of five, the eye needs one edge to return to. Everything
+     else comes from .section-head. */
+  .courses-head { max-width: 52rem; margin-inline: auto; }
+
+  /* Definition list, not a table: these are labelled facts, not tabular data.
+     Small size needs weight to hold its colour, hence the medium label. */
+  .terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+    margin: 0;
+  }
+  .terms > div { display: flex; flex-direction: column; }
+  .terms dt {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .terms dd {
+    margin: 0;
+    font-size: var(--fs-200);
+    font-weight: var(--fw-semibold);
+  }
+
+  /* Inside a course, the same facts read better on one line each. */
+  .terms-inline {
+    flex-direction: column;
+    gap: var(--space-2xs);
+    margin-bottom: var(--space-s);
+  }
+  .terms-inline > div {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-s);
+  }
+  .terms-inline dt { flex: none; min-width: 5.5rem; }
+  .terms-inline dd { font-weight: var(--fw-regular); }
+
+  /* flex:1 so the summary's chevron is pushed to the far edge rather than
+     sitting against the longest role line. */
+  .course-head {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  .course-name {
+    font-size: var(--fs-400);
+    font-weight: var(--fw-bold);
+    color: var(--brand-fg);
+  }
+
+  /* The signature. "For" is a label, the roles are the content, so the label
+     recedes and the roles carry normal text weight. */
+  .course-for {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs) var(--space-2xs);
+    font-size: var(--fs-200);
+    color: var(--text-muted);
+  }
+  .for-label {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+  /* Middot separators via ::before so no empty element is needed, and the
+     first role never gets a leading dot. */
+  .role + .role::before {
+    content: "·";
+    margin-right: var(--space-2xs);
+    color: var(--border);
+  }
+
+  .course-objectives {
+    font-size: var(--fs-400);
+    color: var(--text);
+  }
+  .course-cta { margin-top: var(--space-s); }
+
+  /* ---------- Other realms ---------- */
+  .realm-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-m);
+  }
+
+  .realm-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .realm-link-icon { width: 1.9em; height: 1.9em; color: var(--accent); }
+  .realm-link-n {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .realm-link-title { font-weight: var(--fw-semibold); color: var(--brand-fg); }
+
+  .cta-band .lede { margin-bottom: var(--space-m); }
+</style>

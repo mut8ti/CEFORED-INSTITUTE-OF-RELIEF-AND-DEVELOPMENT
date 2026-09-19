@@ -1,0 +1,236 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import PageHead from '../components/PageHead.astro';
+import { realms } from '../data/realms.js';
+import aboutImg from '../assets/images/about1.webp';
+
+const realmBlurbs = {
+  logistics:            'Empowering supply chain professionals with AI tools to optimize procurement, inventory, fleet, and warehouse operations.',
+  business:             'Redefining business strategy through automation, intelligent analytics, and AI-driven decision-making.',
+  health:               'Revolutionizing patient care, data management, and healthcare delivery with artificial intelligence.',
+  'project-management': 'Equipping project leaders to drive smarter execution, risk mitigation, resource optimization, and collaboration.',
+  'it-digital':         'Driving innovation through digital infrastructure, cloud, cybersecurity, and AI-powered systems.',
+  humanitarian:         'Enhancing crisis response, mapping, early warning, resource allocation, and coordination with intelligent tools.',
+};
+
+const values = [
+  ['Integrity',  'We are accountable to the communities and organizations we serve.'],
+  ['Compassion', 'Our work begins with the people affected by crisis and inequity.'],
+  ['Excellence', 'Practical, rigorous training measured by what graduates can actually do.'],
+  ['Community',  'An alumni network that keeps working together long after the course ends.'],
+];
+
+const totalCourses = realms.reduce((n, r) => n + r.courses.length, 0);
+---
+
+<BaseLayout
+  title="About Us — CEFORED Institute of Relief"
+  description="CEFORED Institute of Relief and Development is a pioneering training institute leveraging AI to transform learning in logistics, business, health, project management, IT, and humanitarian response."
+  preloadImage="/images/about1.webp"
+  ogImage="/images/about1.webp"
+>
+
+  <PageHead
+    eyebrow="Who we are"
+    title="About CEFORED"
+    lede="A pioneering training institute leveraging the power of AI to transform learning in the sectors that drive social impact."
+    image={aboutImg}
+  />
+
+  {/* Mission and vision were two bordered boxes side by side. They are two
+      statements of intent — prose, set against a labelled left column, so the
+      page reads as a document rather than a card deck. */}
+  <section class="section">
+    <div class="container">
+      <div class="statement" data-reveal>
+        <h2>Our mission</h2>
+        <p>
+          To build a smarter, more resilient world through practical, AI-empowered
+          education. We specialize in real-time, AI-enhanced training programs in
+          logistics, business management, health systems, project management,
+          humanitarian relief, and digital transformation.
+        </p>
+      </div>
+
+      <div class="statement" data-reveal>
+        <h2>Our vision</h2>
+        <p>
+          To become Africa's most trusted institute for AI-integrated professional
+          training that accelerates development and humanitarian impact.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section realms-section">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <h2>Six realms of transformation</h2>
+        <p class="head-note">{totalCourses} courses</p>
+      </div>
+
+      <ol class="realm-list" data-reveal-group="left">
+        {realms.map((r) => (
+          <li>
+            <a href={`/realms/${r.slug}`}>
+              <span class="realm-n">{String(r.n).padStart(2, '0')}</span>
+              <span class="realm-body">
+                <span class="realm-title">{r.title}</span>
+                <span class="realm-blurb">{realmBlurbs[r.slug]}</span>
+              </span>
+              <span class="realm-count">{r.courses.length} courses</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section values-section">
+    <div class="container">
+      <div class="section-head" data-reveal><h2>Our values</h2></div>
+      <ol class="values" data-reveal-group="left">
+        {values.map(([name, text], i) => (
+          <li>
+            <span class="value-n">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{name}</h3>
+            <p>{text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="statement" data-reveal>
+        <h2>Our team</h2>
+        <p>
+          Our staff and volunteers are experienced professionals committed to relief
+          and development work, bringing field experience from NGOs, government
+          agencies, and international organizations.
+        </p>
+        <div class="btn-row">
+          <Button href="/programs">Explore programs</Button>
+          <Button href="/contact" variant="ghost">Work with us</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* Label left, prose right. On narrow screens the label stacks above, which
+     keeps the reading order identical to the visual order. */
+  .statement {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: var(--space-s) var(--space-l);
+    align-items: start;
+    max-width: 60rem;
+    padding-block: var(--space-l);
+    border-top: 1px solid var(--border);
+  }
+  .statement h2 {
+    margin: 0;
+    font-size: var(--fs-500);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.02em;
+    color: var(--brand-fg);
+  }
+  .statement p {
+    max-width: 60ch;
+    font-size: var(--fs-400);
+  }
+  .statement .btn-row { justify-content: flex-start; margin-top: var(--space-m); }
+
+  @media (max-width: 44rem) {
+    .statement { grid-template-columns: 1fr; gap: var(--space-2xs); }
+  }
+
+  .head-note {
+    margin: 0;
+    font-size: var(--fs-100);
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Same numbered-row treatment as the homepage index, minus the preview panel
+     — this page is prose about the institute, not a place to browse from. */
+  .realm-list { margin: 0; padding: 0; list-style: none; }
+  .realm-list li { border-top: 1px solid var(--border); }
+  .realm-list li:last-child { border-bottom: 1px solid var(--border); }
+  .realm-list li { transition: background-color 0.3s; }
+  .realm-list li:has(a:hover),
+  .realm-list li:has(a:focus-visible) { background: var(--surface); }
+
+  .realm-list a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-s);
+    padding: var(--space-m) var(--space-2xs);
+    color: var(--text);
+    text-decoration: none;
+    /* transform, never padding: animating padding reflows the row each frame. */
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .realm-list a:hover,
+  .realm-list a:focus-visible { transform: translateX(var(--space-2xs)); }
+
+  .realm-n {
+    font-size: var(--fs-600);
+    font-weight: var(--fw-light);
+    line-height: 1;
+    color: var(--brand-fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .realm-body { display: flex; flex-direction: column; gap: var(--space-3xs); }
+  .realm-title {
+    font-size: var(--fs-500);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    color: var(--brand-fg);
+  }
+  .realm-blurb { font-size: var(--fs-200); color: var(--text-muted); max-width: 52ch; }
+  .realm-count {
+    font-size: var(--fs-100);
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 44rem) {
+    .realm-list a { grid-template-columns: auto 1fr; row-gap: var(--space-2xs); }
+    .realm-count { grid-column: 2; }
+  }
+
+  .values-section {
+    background: var(--surface);
+    border-block: 1px solid var(--border);
+  }
+  .values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-l) var(--space-xl);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .values li { display: grid; gap: var(--space-3xs); align-content: start; }
+  .value-n {
+    font-size: var(--fs-200);
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.1em;
+    color: var(--accent-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .values h3 { margin: 0; font-size: var(--fs-500); color: var(--brand-fg); }
+  .values p { margin: 0; color: var(--text-muted); }
+</style>

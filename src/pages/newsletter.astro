@@ -1,0 +1,104 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import PageHead from '../components/PageHead.astro';
+import Button from '../components/Button.astro';
+
+const perks = [
+  ['graduation-cap',     'Insider updates on cutting-edge training programs'],
+  ['article',            'Expert blogs and alumni success stories'],
+  ['wrench',             'Tools for humanitarian innovation'],
+  ['brain',              'The latest in AI for development'],
+];
+---
+
+<BaseLayout
+  title="Newsletter — CEFORED Institute of Relief"
+  description="Subscribe to the CEFORED newsletter for updates on AI-driven training programs, expert insights, alumni stories, and tools for humanitarian innovation."
+>
+
+  <PageHead
+    title="Join the Movement"
+    lede="Stay ahead with AI and impact. Be part of Africa's most dynamic AI-driven learning revolution."
+  />
+
+  <section class="section">
+    <div class="container newsletter-grid">
+
+      <Card pad="l" class="perks" data-reveal="left">
+        <h2>What you'll get</h2>
+        <ul class="perk-list">
+          {perks.map(([icon, text]) => (
+            <li>
+              <Icon name={`ph:${icon}`} class="icon-accent" />
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="perk-note">
+          Straight to your inbox, only from CEFORED. Unsubscribe any time.
+        </p>
+      </Card>
+
+      <Card
+        as="form"
+        pad="l"
+        class="newsletter-form"
+        data-firestore="newsletter"
+        data-success="Thank you for subscribing. You are now part of our newsletter."
+        data-reveal="right"
+        novalidate
+      >
+        <h2>Subscribe</h2>
+
+        <div class="field">
+          <label for="name">Name <span aria-hidden="true">*</span></label>
+          <input class="input" type="text" id="name" name="name" required autocomplete="name" placeholder="Your name" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email <span aria-hidden="true">*</span></label>
+          <input class="input" type="email" id="email" name="email" required autocomplete="email" placeholder="your.email@example.com" />
+        </div>
+
+        <div class="honeypot" aria-hidden="true">
+          <label for="website">Leave this field empty</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <Button type="submit">Subscribe</Button>
+        <p data-form-status=""></p>
+      </Card>
+
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .newsletter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .perks h2, .newsletter-form h2 {
+    font-size: var(--fs-500);
+    color: var(--brand-fg);
+  }
+
+  .perk-list { margin: 0 0 var(--space-s); padding: 0; list-style: none; }
+  .perk-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) 0;
+  }
+  .perk-note { margin: 0; font-size: var(--fs-200); color: var(--text-muted); }
+</style>
+
+<script>
+  import '../scripts/forms.js';
+</script>

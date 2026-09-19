@@ -1,0 +1,242 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import { realms } from '../data/realms.js';
+import logoImg from '../assets/images/logo-final.webp';
+import '@fontsource-variable/nunito-sans';
+/* Real italics. Without this the four italic rules on the site render as a
+   browser-synthesised oblique — the roman slanted by shear, not the drawn
+   italic. unicode-range keeps it from being fetched by anyone who never
+   reaches italic text. */
+import '@fontsource-variable/nunito-sans/wght-italic.css';
+import Seo from '../components/Seo.astro';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+const { title, description, preloadImage, ogImage, pageType, schema } = Astro.props;
+
+const nav = [
+  { href: '/',                   label: 'Home' },
+  { href: '/about',              label: 'About Us' },
+  { href: '/programs',           label: 'Programs', also: ['/realms'] },
+  { href: '/faqs',               label: 'FAQs' },
+  { href: '/corporate-training', label: 'Corporate' },
+  { href: '/contact',            label: 'Contact' },
+];
+
+/* build.format is 'file', so pathname arrives as '/about.html'. Normalise to
+   the clean form the hrefs use, or nothing ever matches. */
+const path =
+  Astro.url.pathname
+    .replace(/\.html$/, '')
+    .replace(/\/index$/, '')
+    .replace(/\/+$/, '') || '/';
+
+/* Exact match, or a descendant of the item (so /realms/logistics lights up
+   Programs and /blog/a-post lights up Blog). */
+const isCurrent = (item) => {
+  const targets = [item.href, ...(item.also ?? [])];
+  return targets.some((t) =>
+    t === '/' ? path === '/' : path === t || path.startsWith(t + '/')
+  );
+};
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+
+  {preloadImage && <link rel="preload" href={preloadImage} as="image" fetchpriority="high" />}
+
+  <Seo title={title} description={description} image={ogImage} type={pageType} schema={schema} />
+
+  <!-- Applies the saved theme before first paint. Must stay inline and blocking. -->
+  <script is:inline>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    } catch (e) {}
+
+    /* Motion probe. Only when this class lands does the pre-animation hidden
+       state in base.css apply, so no-JS and reduced-motion users see content. */
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('js-motion');
+    }
+  </script>
+</head>
+<body>
+
+{/* Sits at the very top of the document; the header watches it to know whether
+    the page has scrolled. Zero height, so it changes no layout. */}
+<div class="scroll-sentinel" aria-hidden="true"></div>
+
+<header class="site-header">
+  <a class="brand" href="/">
+    <span class="brand-mark">
+      <Image src={logoImg} alt="CEFORED Logo" width={48} height={48} fetchpriority="high" />
+    </span>
+    <span class="brand-text">
+      CEFORED
+      <small>Institute of Relief</small>
+    </span>
+  </a>
+
+  <nav class="nav" id="main-nav" aria-label="Main">
+    {nav.map(item => (
+      <a href={item.href} aria-current={isCurrent(item) ? 'page' : undefined}>
+        {item.label}
+      </a>
+    ))}
+  </nav>
+
+  <button class="icon-btn theme-toggle" type="button" aria-label="Switch to dark mode">
+    <Icon name="ph:moon" class="icon-moon" />
+    <Icon name="ph:sun" class="icon-sun" />
+  </button>
+  <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu">
+    <span class="bars" aria-hidden="true"><span></span><span></span></span>
+  </button>
+</header>
+
+<main>
+  <slot />
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="footer-mark">
+          <Image src={logoImg} alt="CEFORED Logo" width={48} height={48} loading="lazy" />
+        </span>
+        <p class="footer-name">CEFORED<span>Institute of Relief and Development</span></p>
+        <p class="footer-blurb">
+          Applied AI training for logistics, business, health, project management,
+          IT, and humanitarian teams.
+        </p>
+      </div>
+
+      {/* The six realms are the site's real structure, so the footer carries
+          them as deep links rather than making /programs the only way in. */}
+      <nav class="footer-col" aria-label="Realms">
+        <h2>Realms</h2>
+        <ul>
+          {realms.map((r) => (
+            <li>
+              <a href={`/realms/${r.slug}`}>
+                <span class="footer-n">{String(r.n).padStart(2, '0')}</span>
+                {r.short ?? r.title.replace(/^AI (in|for) /, '')}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="Institute">
+        <h2>Institute</h2>
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/programs">Programs</a></li>
+          <li><a href="/admission">Admission</a></li>
+          <li><a href="/corporate-training">Corporate Training</a></li>
+          <li><a href="/faqs">FAQs</a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-col">
+        <h2>Get in touch</h2>
+        <ul>
+          <li><a href="mailto:info@cefored.com">info@cefored.com</a></li>
+          <li><a href="tel:+254755445982">+254 755 445 982</a></li>
+          <li class="footer-plain">Nairobi, Kenya</li>
+        </ul>
+        <a class="footer-cta" href="/newsletter">
+          Join the newsletter
+          <Icon name="ph:arrow-right" />
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {new Date().getFullYear()} CEFORED Institute of Relief and Development. All rights reserved.</p>
+      <a href="/contact">Contact us</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* Motion is loaded dynamically so the ~39KB of GSAP + Lenis is never
+     fetched by users who have asked for reduced motion. If it fails to load
+     or throws, drop js-motion so the pre-animation hidden state lifts and the
+     page is readable — a broken animation must never cost the content. */
+  if (document.documentElement.classList.contains('js-motion')) {
+    import('../scripts/motion.js').catch(() => {
+      document.documentElement.classList.remove('js-motion');
+    });
+  }
+
+  /* Shell behaviour: theme toggle + mobile nav.
+     The programs accordion is native <details>, so it needs no JS. */
+  const root = document.documentElement;
+
+  /* Both icons are in the DOM and CSS shows one, so the button is never empty
+     before this runs. Only the label needs updating. */
+  const themeBtn = document.querySelector('.theme-toggle');
+  if (themeBtn) {
+    const label = () => themeBtn.setAttribute(
+      'aria-label',
+      root.classList.contains('dark-mode') ? 'Switch to light mode' : 'Switch to dark mode'
+    );
+    label();
+    themeBtn.addEventListener('click', () => {
+      root.classList.toggle('dark-mode');
+      localStorage.setItem('theme', root.classList.contains('dark-mode') ? 'dark' : 'light');
+      label();
+    });
+  }
+
+  const navBtn = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.nav');
+  if (navBtn && nav) {
+    const isOpen = () => navBtn.getAttribute('aria-expanded') === 'true';
+    const setOpen = (open) => {
+      navBtn.setAttribute('aria-expanded', String(open));
+      navBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+
+    navBtn.addEventListener('click', () => setOpen(!isOpen()));
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !nav.contains(e.target) && !navBtn.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) { setOpen(false); navBtn.focus(); }
+    });
+    nav.addEventListener('click', (e) => { if (e.target.matches('a')) setOpen(false); });
+  }
+
+  /* The header materialises once the page has moved. Observing a sentinel at
+     the top of the document costs nothing per frame, unlike a scroll handler
+     reading scrollY. */
+  const header = document.querySelector('.site-header');
+  const sentinel = document.querySelector('.scroll-sentinel');
+  if (header && sentinel) {
+    new IntersectionObserver(
+      ([entry]) => header.classList.toggle('is-scrolled', !entry.isIntersecting)
+    ).observe(sentinel);
+  }
+</script>
+
+</body>
+</html>
