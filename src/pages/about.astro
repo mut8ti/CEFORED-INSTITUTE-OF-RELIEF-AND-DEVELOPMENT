@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import PageHead from '../components/PageHead.astro';
 import { realms } from '../data/realms.js';
+import aboutImg from '../assets/images/about1.webp';
 
 const realmBlurbs = {
   logistics:            'Empowering supply chain professionals with AI tools to optimize procurement, inventory, fleet, and warehouse operations.',
@@ -34,9 +35,7 @@ const totalCourses = realms.reduce((n, r) => n + r.courses.length, 0);
     eyebrow="Who we are"
     title="About CEFORED"
     lede="A pioneering training institute leveraging the power of AI to transform learning in the sectors that drive social impact."
-    image="/images/about1.webp"
-    imageWidth={1200}
-    imageHeight={433}
+    image={aboutImg}
   />
 
   {/* Mission and vision were two bordered boxes side by side. They are two
