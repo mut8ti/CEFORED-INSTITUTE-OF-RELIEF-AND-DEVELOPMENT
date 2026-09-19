@@ -6,8 +6,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // Required for canonical URLs and sitemap generation.
-  // CHANGE THIS if the site deploys to a different domain.
-  site: 'https://www.ceforedconsultancy.com',
+  site: 'https://cefored.org',
 
   // Emit /about.html rather than /about/index.html, so the existing
   // clean-URL rewrite rules in .htaccess keep working unchanged.
