@@ -1,7 +1,7 @@
 ---
 /* Canonical URL, Open Graph, Twitter card and JSON-LD.
    Rendered once per page from BaseLayout — nothing else should emit these. */
-const { title, description, image = '/images/og-cover.png', type = 'website', schema } = Astro.props;
+const { title, description, image = '/images/logo-final.png', type = 'website', schema } = Astro.props;
 
 const cleanPath =
   Astro.url.pathname
@@ -38,8 +38,6 @@ const organisation = {
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
 <meta property="og:locale" content="en_GB" />
 
 <meta name="twitter:card" content="summary_large_image" />
