@@ -36,7 +36,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
   <title>Contact Us - CEFORED Institute of Relief</title>
 
   <link rel="stylesheet" href="styles.min.v1.css">
-  
+
   <!-- Unified Navbar CSS -->
   <link rel="stylesheet" href="css/navbar.css">
   <script src='js/navbar.js' defer></script>
@@ -230,12 +230,12 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       background: var(--accent-alt);
       color: #23242b;
     }
-    
+
     body.dark-mode {
       background-color: #181a20 !important;
       color: #fff !important;
     }
-    
+
     body.dark-mode .hero.contact-hero {
       background: linear-gradient(rgba(0,0,0,0.68), rgba(0,0,0,0.68)), url('images/contactbg.webp') center center no-repeat !important;
       background-size: cover !important;
@@ -251,13 +251,13 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       background: #2a2c34 !important;
       border: 1px solid #3a3d48 !important;
     }
-    
+
     body.dark-mode label {
       color: #e0e0e0 !important;
       display: block;
       margin-bottom: 0.5rem;
     }
-    
+
     body.dark-mode input[type="text"],
     body.dark-mode input[type="email"],
     body.dark-mode input[type="tel"],
@@ -272,7 +272,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       margin-bottom: 1.2rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    
+
     body.dark-mode input:focus,
     body.dark-mode textarea:focus,
     body.dark-mode select:focus {
@@ -280,7 +280,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       border-color: var(--accent) !important;
       box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
     }
-    
+
     body.dark-mode select {
       appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
@@ -289,7 +289,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       background-size: 1.2em auto !important;
       padding-right: 2em !important;
     }
-    
+
     body.dark-mode .form-icon-decor {
       color: var(--accent);
     }
@@ -307,7 +307,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       background: var(--accent-alt) !important;
       color: #23242b !important;
     }
-    
+
     body.dark-mode .contact-info-box,
     body.dark-mode .contact-info-box h3,
     body.dark-mode .contact-info-box ul,
@@ -316,12 +316,12 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
       color: #fff !important;
       text-shadow: 0 1px 4px #0002;
     }
-    
+
     </style>
-    
+
     <!-- Removed inline header styles - using unified navbar.css instead -->
-    
-    
+
+
   <script src='js/error-handler.js'></script>
 </head>
 <body id="body-root">
@@ -359,25 +359,25 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
   <!-- Main Content Section: Contact Form -->
   <main class="contact-form-section">
     <span class="form-icon-decor"><i class="fas fa-envelope-open-text"></i></span>
-              
+
         <form id="contactForm" action="#" method="post" class="responsive-form">
-          
+
           <!-- Name Field -->
           <div class="form-group">
             <label for="name" class="form-label">Full Name *</label>
-            <input type="text" id="name" name="name" required 
-                   placeholder="Enter your full name" 
+            <input type="text" id="name" name="name" required
+                   placeholder="Enter your full name"
                    class="form-input">
           </div>
-  
+
           <!-- Email Field -->
           <div class="form-group">
             <label for="email" class="form-label">Email Address *</label>
-            <input type="email" id="email" name="email" required 
-                   placeholder="your.email@example.com" 
+            <input type="email" id="email" name="email" required
+                   placeholder="your.email@example.com"
                    class="form-input">
           </div>
-  
+
           <!-- Phone Field -->
           <div class="form-group">
             <label for="phone" class="form-label">Phone Number *</label>
@@ -455,12 +455,12 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
               <option value="+84">🇻🇳 +84 (Vietnam)</option>
               <option value="+263">🇿🇼 +263 (Zimbabwe)</option>
               </select>
-              <input type="tel" id="phone" name="phone" required 
-                     placeholder="712345678" 
+              <input type="tel" id="phone" name="phone" required
+                     placeholder="712345678"
                      class="form-input phone-input">
             </div>
           </div>
-  
+
           <!-- Course Selection -->
           <div class="form-group">
             <label for="course" class="form-label">Course Interest</label>
@@ -472,32 +472,32 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
               <option value="project">Project Management</option>
               <option value="it">Information Technology</option>
               <option value="humanitarian">Humanitarian Response</option>
-  
+
             </select>
           </div>
-  
+
           <!-- Message Field -->
           <div class="form-group">
             <label for="message" class="form-label">Message</label>
-            <textarea id="message" name="message" rows="5" 
+            <textarea id="message" name="message" rows="5"
                       placeholder="Tell us about your inquiry, goals, or any questions you have..."
                       class="form-textarea"></textarea>
           </div>
-  
+
           <!-- Submit Button -->
          <button type="submit" class="cta-button">Send Message</button>
-  
+
           <!-- Form Messages -->
           <div id="formMessage" class="form-message"></div>
           <p id="wbalert" class="form-alert"></p>
         </form>
-  
+
         <script>
           // Modern Contact Form Handler - Phone field only
           document.addEventListener('DOMContentLoaded', function() {
             const countryCode = document.getElementById('countryCode');
             const phoneInput = document.getElementById('phone');
-  
+
             // Phone input prefill and validation
             function updatePhonePrefix() {
               const prefix = countryCode.value + ' ';
@@ -505,10 +505,10 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
                 phoneInput.value = prefix;
               }
             }
-  
+
             // Initialize phone input
             updatePhonePrefix();
-  
+
             // Handle country code changes
             countryCode.addEventListener('change', function() {
               const currentValue = phoneInput.value;
@@ -517,10 +517,10 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
               phoneInput.value = countryCode.value + ' ' + numberPart.trim();
               phoneInput.focus();
             });
-  
+
             // Handle phone input focus
             phoneInput.addEventListener('focus', updatePhonePrefix);
-  
+
             // Note: Form submission is handled by database.js module
           });
         </script>
@@ -531,7 +531,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
           <ul class="contact-info-list">
             <li>✉️ <strong>Email:</strong> <a href="mailto:info@cefored.com">info@cefored.com</a></li>
             <li>📞 <strong>Phone:</strong> <a href="tel:+254755445982">+254 755445982</a></li>
-            <li>🌐 <strong>Website:</strong> <a href="https://www.ceforedconsultancy.com" target="_blank" rel="noopener">www.ceforedconsultancy.com</a></li>
+            <li>🌐 <strong>Website:</strong> <a href="https://www.cefored.org" target="_blank" rel="noopener">www.cefored.org</a></li>
             <li>📍 <strong>Location:</strong> Nairobi, Kenya.</li>
           </ul>
         </div>
@@ -552,7 +552,7 @@ html.transitions-enabled * { transition: background 0.3s, color 0.3s, border-col
         window.addEventListener('load', function() {
             const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
             console.log('Page load time:', loadTime + 'ms');
-            
+
             const entries = performance.getEntriesByType('resource');
             entries.forEach(entry => {
                 if (entry.transferSize === 0) {

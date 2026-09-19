@@ -410,7 +410,7 @@ These are not code problems and should not be guessed at.
 
 ## Before launch
 
-- **Confirm the production domain.** `https://www.ceforedconsultancy.com` is
+- **Confirm the production domain.** `https://www.cefored.org` is
   baked into every canonical, the sitemap and robots.txt. Wrong canonicals are
   worse than none. One line in `astro.config.mjs` plus `public/robots.txt`.
 - **Enable Firebase App Check.** The contact and newsletter forms are
